@@ -24,13 +24,16 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <div class="auth-wrapper" style="background-color: var(--card-bg);">
-        <div class="container text-center" style="max-width: 800px; text-align: center;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">🏢</div>
-            <h1 class="page-title" style="font-size: 3rem; margin-bottom: 1.5rem; color: var(--primary-color);">Kamsis</h1>
+    <div class="auth-wrapper">
+        <div class="landing-hero text-center" style="max-width: 800px; margin: 0 auto;">
+            <div class="landing-icon" style="color: var(--primary-color);">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 80px; height: 80px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                </svg>
+            </div>
+            <h1 class="page-title" style="font-size: 3.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Kamsis</h1>
             <p class="page-subtitle" style="font-size: 1.25rem;">
-                Platform resmi reservasi ruang perkuliahan, ruang rapat, dan laboratorium kampus. 
-                Pesan ruangan dengan cepat, aman, dan tanpa bentrok jadwal.
+                Platform resmi reservasi ruang perkuliahan, ruang rapat, dan laboratorium kampus. <br>Pesan ruangan dengan cepat, aman, dan tanpa bentrok jadwal.
             </p>
             
             <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
