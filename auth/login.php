@@ -75,9 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="auth-wrapper">
+        <div class="floating-blob-1"></div>
+        <div class="floating-blob-2"></div>
         <div class="auth-card">
             <div class="auth-header">
-                <h1>Kamsis</h1>
+                <h1 class="gradient-text" style="font-family: 'Outfit', sans-serif;">Kamsis</h1>
                 <p class="text-muted">Sistem Booking Ruangan Kampus</p>
             </div>
             

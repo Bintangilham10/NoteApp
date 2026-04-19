@@ -79,9 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="auth-wrapper">
+        <div class="floating-blob-1"></div>
+        <div class="floating-blob-2"></div>
         <div class="auth-card">
             <div class="auth-header">
-                <h1>Daftar Akun</h1>
+                <h1 class="gradient-text" style="font-family: 'Outfit', sans-serif;">Daftar Akun</h1>
                 <p class="text-muted">Lengkapi data Anda di bawah ini</p>
             </div>
             
@@ -110,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="password" name="konfirmasi_password" class="form-control" required placeholder="Ulangi password">
                 </div>
                 
-                <button type="submit" class="btn btn-success btn-block" style="margin-top: 1rem; padding: 0.75rem;">Mendaftar</button>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem; padding: 0.75rem;">Mendaftar</button>
             </form>
             
             <p style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem;">

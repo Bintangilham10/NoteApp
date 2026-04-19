@@ -148,17 +148,7 @@ if (isset($_SESSION['user_id'])) {
                     </a>
                 </div>
                 
-                <!-- Social Proof -->
-                <div style="margin-top: 3.5rem; display: flex; align-items: center; gap: 1rem; justify-content: inherit;">
-                    <div style="display: flex;">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid white; box-shadow: var(--shadow-soft);">
-                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid white; margin-left: -15px; box-shadow: var(--shadow-soft);">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" style="width: 48px; height: 48px; border-radius: 50%; border: 3px solid white; margin-left: -15px; box-shadow: var(--shadow-soft);">
-                    </div>
-                    <div style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.4;">
-                        <strong style="color: var(--text-dark); font-size: 1.1rem;">500+</strong><br>Mahasiswa Terdaftar.
-                    </div>
-                </div>
+
             </div>
 
             <!-- Right Glass Mockup -->
