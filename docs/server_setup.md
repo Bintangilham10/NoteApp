@@ -6,7 +6,7 @@ Dokumen ini berisi panduan tahap demi tahap untuk mempublikasikan proyek **Siste
 
 ## Tahap 0: Persiapan Virtual Machine (VM) dan Jaringan Statis
 
-Sesuai dengan ketentuan tugas, 3 digit akhir NIM Anda adalah **016**, sehingga *IP Address* kelas C yang dialokasikan adalah **`192.168.1.16`**.
+Sesuai dengan ketentuan tugas, 3 digit akhir NIM Anda adalah **016**, sehingga *IP Address* kelas C yang dialokasikan adalah **`192.168.18.16`**.
 
 ### Langkah A: Setting Network VirtualBox (Di Windows)
 Lakukan instruksi ini saat VirtualBox VM Ubuntu Anda dalam kondisi mati (Power Off):
@@ -29,17 +29,18 @@ Lakukan instruksi ini saat VirtualBox VM Ubuntu Anda dalam kondisi mati (Power O
 3. Sesuaikan isinya persis seperti format berikut (Gunakan *spasi* untuk tabulasi):
    ```yaml
    network:
+     version: 2
+     renderer: networkd
      ethernets:
        enp0s3:                     
          dhcp4: false              
          addresses:
-           - 192.168.1.16/24       
+           - 192.168.18.16/24       
          routes:
            - to: default
-             via: 192.168.1.1      
+             via: 192.168.18.1      
          nameservers:
            addresses: [8.8.8.8, 1.1.1.1]
-     version: 2
    ```
 4. Simpan (Ctrl+O, Enter), dan keluar (Ctrl+X). Terapkan pengaturan dengan perintah:
    ```bash
@@ -47,7 +48,7 @@ Lakukan instruksi ini saat VirtualBox VM Ubuntu Anda dalam kondisi mati (Power O
    ```
 
 > **🔍 Pengecekan Tahap 0:**
-> 1. Ketik perintah: `ip a`. Pastikan IP **192.168.1.16** muncul di antarmuka `enp0s3`.
+> 1. Ketik perintah: `ip a`. Pastikan IP **192.168.18.16** muncul di antarmuka `enp0s3`.
 > 2. Ketik perintah: `ping 8.8.8.8 -c 4`. Jika membalas (Reply), berarti internet Anda sudah jalan dan siap mengunduh paket.
 
 ---
@@ -181,7 +182,7 @@ Untuk mengamankan session (mencegah pencurian) dan mengamankan kata sandi yang d
        DocumentRoot /var/www/html
        
        # Memaksa HTTP lompat ke sambungan SSL HTTPS (Masukkan IP 16 Anda)
-       Redirect permanent "/" "https://192.168.1.16/"
+       Redirect permanent "/" "https://192.168.18.16/"
    </VirtualHost>
    ```
 3. **Restart Penuh Apache:**
@@ -191,9 +192,9 @@ Untuk mengamankan session (mencegah pencurian) dan mengamankan kata sandi yang d
 
 > **🔍 Pengecekan Terakhir (Tahap 5):**
 > 1. Buka browser (Chrome/Firefox) di Laptop Windows Anda.
-> 2. Ketikkan `http://192.168.1.16/Kamsis/` (Tanpa huruf S di HTTP).
+> 2. Ketikkan `http://192.168.18.16/Kamsis/` (Tanpa huruf S di HTTP).
 > 3. *Perhatikan indikator loading di atas*. Ia harus seketika berubah menjadi `https://...` dan memunculkan Peringatan Keamanan *(Privacy error yang merupakan sifat natural self-signed SSL)*.
-> 4. Klik tombol **Advanced (Lanjutan)** > lalu **"Proceed to 192.168.1.16"**. Selesai.
+> 4. Klik tombol **Advanced (Lanjutan)** > lalu **"Proceed to 192.168.18.16"**. Selesai.
 
 ### Menguji Program & Login (Demonstrasi Demo)
 Laman Web akhirnya terbuka dengan aman!
