@@ -6,12 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Menentukan base url secara dinamis (sederhana)
-$base_url = "http://" . $_SERVER['HTTP_HOST'] . "/"; 
-$uri = $_SERVER['REQUEST_URI'];
-// Catatan: Anda mungkin harus menyesuaikan base_url sesuai dengan path folder jika tidak dijalankan di root document.
-// Misalnya jika diakses di http://localhost/Kamsis/, ganti $base_url menjadi http://localhost/Kamsis/
 $dir_name = basename(dirname(__DIR__));
-$base_url = "http://" . $_SERVER['HTTP_HOST'] . "/" . $dir_name . "/";
+$base_url = "/" . $dir_name . "/";
 
 ?>
 <!DOCTYPE html>

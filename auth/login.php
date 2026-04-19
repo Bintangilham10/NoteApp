@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Base URL fallback jika tanpa header global -->
     <?php 
         $dir_name = basename(dirname(__DIR__));
-        $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/" . $dir_name . "/"; 
+        $base_url = "/" . $dir_name . "/"; 
     ?>
     <link rel="stylesheet" href="<?= $base_url ?>assets/css/style.css">
 </head>
