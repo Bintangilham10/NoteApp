@@ -94,22 +94,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form method="POST" action="">
                 <div class="form-group">
                     <label class="form-label">Nama Lengkap</label>
-                    <input type="text" name="nama_lengkap" class="form-control" required placeholder="Contoh: Budi Santoso" value="<?= escape($_POST['nama_lengkap'] ?? '') ?>">
+                    <input type="text" name="nama_lengkap" class="form-control" required maxlength="100" placeholder="Contoh: Bintang" value="<?= escape($_POST['nama_lengkap'] ?? '') ?>">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">NIM / NIP</label>
-                    <input type="text" name="nim_nip" class="form-control" required placeholder="Masukkan nomor identitas" value="<?= escape($_POST['nim_nip'] ?? '') ?>">
+                    <input type="text" name="nim_nip" class="form-control" required maxlength="50" placeholder="Masukkan nomor identitas" value="<?= escape($_POST['nim_nip'] ?? '') ?>">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" required placeholder="Minimal 6 karakter">
+                    <input type="password" name="password" class="form-control" required minlength="6" maxlength="255" placeholder="Minimal 6 karakter">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Konfirmasi Password</label>
-                    <input type="password" name="konfirmasi_password" class="form-control" required placeholder="Ulangi password">
+                    <input type="password" name="konfirmasi_password" class="form-control" required minlength="6" maxlength="255" placeholder="Ulangi password">
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem; padding: 0.75rem;">Mendaftar</button>
