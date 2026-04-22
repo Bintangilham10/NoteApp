@@ -3,7 +3,7 @@
 require_once '../config/database.php';
 require_once '../config/security.php';
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+start_secure_session();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
     header("Location: ../auth/login.php");
     exit;
@@ -21,7 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $keperluan = trim($_POST['keperluan']);
     $user_id = $_SESSION['user_id'];
 
-    if (empty($room_id) || empty($tanggal) || empty($jam_mulai) || empty($jam_selesai) || empty($keperluan)) {
+    if (strlen($keperluan) > 1000) {
+        $error = "Keperluan terlalu panjang.";
+    } elseif (empty($room_id) || empty($tanggal) || empty($jam_mulai) || empty($jam_selesai) || empty($keperluan)) {
         $error = "Semua field wajib diisi.";
     } elseif (strtotime($jam_selesai) <= strtotime($jam_mulai)) {
         $error = "Jam selesai harus setelah jam mulai.";
@@ -111,7 +113,7 @@ require_once '../includes/header.php';
 
         <div class="form-group">
             <label class="form-label">Keperluan</label>
-            <textarea name="keperluan" class="form-control" required placeholder="Jelaskan untuk agenda apa ruangan ini digunakan..."></textarea>
+            <textarea name="keperluan" class="form-control" required maxlength="1000" placeholder="Jelaskan untuk agenda apa ruangan ini digunakan..."></textarea>
         </div>
 
         <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Ajukan Booking</button>
