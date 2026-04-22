@@ -3,7 +3,7 @@
 require_once '../config/database.php';
 require_once '../config/security.php';
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+start_secure_session();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
     header("Location: ../auth/login.php");
     exit;
