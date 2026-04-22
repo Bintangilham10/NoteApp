@@ -186,7 +186,7 @@ if (isset($_SESSION['user_id'])) {
                             </div>
                             <div style="flex: 1;">
                                 <h4 style="font-weight: 700; font-size: 1rem; color: #94a3b8;">13:00 - 15:00 WIB</h4>
-                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Kuliah Umum Fisika</p>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Kuliah Keamanan Sistem</p>
                             </div>
                             <span style="color: #cbd5e1; font-weight: 700; font-size: 0.9rem;">Penuh</span>
                         </div>

@@ -110,15 +110,28 @@ Kita perlu membuat database kosong dan mengimpor struktur tabel bawaan.
    
    EXIT;
    ```
-3. **Mengimpor Skema:**
+3. **Buat user aplikasi khusus dan beri hak akses ke database:**
+   Jalankan perintah ini dari terminal bash:
+   ```bash
+   sudo mysql -u root -e "CREATE USER IF NOT EXISTS 'kamsis_app'@'localhost' IDENTIFIED BY 'GantiPasswordKuat123!'; GRANT ALL PRIVILEGES ON kamsis_db.* TO 'kamsis_app'@'localhost'; FLUSH PRIVILEGES;"
+   ```
+4. **Mengimpor Skema:**
    Teruskan ke terminal bash, lalu salin struktur `.sql` langsung ke database:
    ```bash
    sudo mysql -u root -p kamsis_db < /var/www/html/Kamsis/database/schema.sql
    ```
+5. **Sediakan kredensial database via environment Apache:**
+   Buka file virtual host HTTPS lalu tambahkan dua baris ini di dalam blok `<VirtualHost _default_:443>`:
+   ```apache
+   SetEnv KAMSIS_DB_USER kamsis_app
+   SetEnv KAMSIS_DB_PASS GantiPasswordKuat123!
+   ```
+   Jika Anda juga ingin aplikasi tetap berjalan saat mengakses HTTP lokal, tambahkan baris yang sama ke blok `<VirtualHost *:80>`.
 
 > **🔍 Pengecekan Tahap 3:**
 > 1. Ketik: `sudo mysql -u root -e "SHOW DATABASES;"` -> *Pastikan ada `kamsis_db`*.
 > 2. Ketik: `sudo mysql -u root -e "USE kamsis_db; SHOW TABLES;"` -> *Pastikan tabel `users`, `rooms`, dan `bookings` terdaftar di sana.*
+> 3. Setelah restart Apache, buka kembali aplikasi dan pastikan koneksi database tetap berhasil menggunakan user `kamsis_app`.
 
 ---
 
