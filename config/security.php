@@ -27,11 +27,17 @@ function escape($data) {
 function start_secure_session() {
     // Set keamanan cookies (memerlukan PHP dan pengaturan Server HTTP)
     $cookieParams = session_get_cookie_params();
+    $isHttps = (
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['SERVER_PORT'] ?? null) == 443)
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    );
+
     session_set_cookie_params([
         'lifetime' => $cookieParams["lifetime"],
         'path' => '/',
         'domain' => $cookieParams["domain"],
-        'secure' => false, // Set ke true PADA PRODUKSI dimana HTTPS tersedia. Agar cookie hanya dikirim via sambungan internet ter-enkripsi.
+        'secure' => $isHttps, // Aktif otomatis di HTTPS, tetap berfungsi di lingkungan HTTP lokal.
         'httponly' => true, // Menolak akses manipulasi cookie melaui JavaScript (Mencegah Pencurian Sesi via XSS).
         'samesite' => 'Strict' // Cookie tidak akan dikirimkan pada permintaan lintas situs.
     ]);

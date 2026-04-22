@@ -1,9 +1,7 @@
 <?php
 // includes/header.php
-// Pastikan session sudah menyala (bisa diakses via auth atau tiap halaman)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../config/security.php';
+start_secure_session();
 
 // Menentukan base url secara dinamis (sederhana)
 $dir_name = basename(dirname(__DIR__));
