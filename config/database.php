@@ -3,8 +3,12 @@
 
 $host = 'localhost';
 $dbname = 'kamsis_db';
-$username = 'root'; // Ganti dengan user database masing-masing
-$password = '';     // Ganti dengan password database masing-masing
+$username = getenv('KAMSIS_DB_USER') ?: 'root'; // Override di server dengan env var.
+$password = getenv('KAMSIS_DB_PASS');
+
+if ($password === false) {
+    $password = ''; // Default lokal; jangan commit password produksi ke source.
+}
 
 try {
     // Membuat koneksi ke database dengan PDO
