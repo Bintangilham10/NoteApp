@@ -3,7 +3,7 @@
 require_once '../config/database.php';
 require_once '../config/security.php';
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+start_secure_session();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../auth/login.php");
     exit;
@@ -35,7 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $foto = trim($_POST['foto']); // Hanya menampung nama file/URL mockup sementara
     $id = $_POST['id'] ?? 0;
 
-    if (empty($nama_ruangan) || $kapasitas <= 0 || empty($fasilitas)) {
+    if (strlen($nama_ruangan) > 100 || strlen($fasilitas) > 2000 || strlen($foto) > 255) {
+        $error = "Panjang input melebihi batas yang diizinkan.";
+    } elseif (empty($nama_ruangan) || $kapasitas <= 0 || empty($fasilitas)) {
         $error = "Nama ruangan, fasilitas, dan kapasitas (di atas 0) wajib diisi.";
     } else {
         try {
@@ -147,7 +149,7 @@ require_once '../includes/header.php';
             
             <div class="form-group">
                 <label class="form-label">Nama Ruangan</label>
-                <input type="text" name="nama_ruangan" class="form-control" required value="<?= $room ? escape($room['nama_ruangan']) : '' ?>">
+                <input type="text" name="nama_ruangan" class="form-control" required maxlength="100" value="<?= $room ? escape($room['nama_ruangan']) : '' ?>">
             </div>
             
             <div class="form-group">
@@ -157,12 +159,12 @@ require_once '../includes/header.php';
             
             <div class="form-group">
                 <label class="form-label">Fasilitas Lengkap</label>
-                <textarea name="fasilitas" class="form-control" required><?= $room ? escape($room['fasilitas']) : '' ?></textarea>
+                <textarea name="fasilitas" class="form-control" required maxlength="2000"><?= $room ? escape($room['fasilitas']) : '' ?></textarea>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Nama File Foto (Opsional)</label>
-                <input type="text" name="foto" class="form-control" placeholder="r1.jpg" value="<?= $room ? escape($room['foto']) : '' ?>">
+                <input type="text" name="foto" class="form-control" maxlength="255" placeholder="r1.jpg" value="<?= $room ? escape($room['foto']) : '' ?>">
             </div>
 
             <button type="submit" class="btn btn-success">Simpan Data</button>
