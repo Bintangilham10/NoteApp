@@ -1,8 +1,9 @@
 <?php
 // config/database.php
 
-$host = 'localhost';
-$dbname = 'kamsis_db';
+$host = getenv('KAMSIS_DB_HOST') ?: 'localhost';
+$port = getenv('KAMSIS_DB_PORT') ?: '3306';
+$dbname = getenv('KAMSIS_DB_NAME') ?: 'kamsis_db';
 $username = getenv('KAMSIS_DB_USER') ?: 'root'; // Override di server dengan env var.
 $password = getenv('KAMSIS_DB_PASS');
 
@@ -12,7 +13,7 @@ if ($password === false) {
 
 try {
     // Membuat koneksi ke database dengan PDO
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $username, $password);
     
     // Set response agar selalu menampilkan exception secara default (untuk proses debug)
     // Di mode production, error tidak dimunculkan ke end user namun dicatat di error log
