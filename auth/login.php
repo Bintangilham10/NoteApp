@@ -22,7 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validasi input untuk mencegah eksekusi berlebih
     // Menolak input jika lebih dari panjang kolom max db
-    if (strlen($nim_nip) > 50 || strlen($password) > 255) {
+    if (!is_valid_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error = "Sesi form tidak valid. Silakan muat ulang halaman.";
+    } elseif (strlen($nim_nip) > 50 || strlen($password) > 255) {
         $error = "Panjang karakter tidak valid.";
     } elseif (empty($nim_nip) || empty($password)) {
         $error = "NIM/NIP dan Password harus diisi.";
@@ -93,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="POST" action="">
+                <?= csrf_input() ?>
                 <div class="form-group">
                     <label class="form-label">NIM / NIP</label>
                     <input type="text" name="nim_nip" class="form-control" required placeholder="Masukkan NIM atau NIP Anda" autocomplete="off">
