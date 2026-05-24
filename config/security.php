@@ -22,9 +22,29 @@ function escape($data) {
 }
 
 /**
+ * Header keamanan dasar yang aman untuk aplikasi ini.
+ */
+function send_security_headers() {
+    static $sent = false;
+
+    if ($sent || headers_sent()) {
+        return;
+    }
+
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+
+    $sent = true;
+}
+
+/**
  * Konfigurasi session yang aman untuk menghindari Session Hijacking
  */
 function start_secure_session() {
+    send_security_headers();
+
     // Set keamanan cookies (memerlukan PHP dan pengaturan Server HTTP)
     $cookieParams = session_get_cookie_params();
     $isHttps = (
@@ -50,5 +70,34 @@ function start_secure_session() {
     // Melakukan regenerasi ID Session tiap saat menghindari Session Fixation Fix (Optional)
     // Jangan letakkan di semua reload agar tak merepotkan logika, 
     // Tapi sebaiknya diubah pada saat proses krusial seperti Login/Logout.
+}
+
+/**
+ * Token CSRF untuk melindungi form POST dari request lintas situs.
+ */
+function csrf_token() {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        start_secure_session();
+    }
+
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+
+function csrf_input() {
+    return '<input type="hidden" name="csrf_token" value="' . escape(csrf_token()) . '">';
+}
+
+function is_valid_csrf_token($token) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        start_secure_session();
+    }
+
+    return is_string($token)
+        && isset($_SESSION['csrf_token'])
+        && hash_equals($_SESSION['csrf_token'], $token);
 }
 ?>
