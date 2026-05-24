@@ -143,6 +143,7 @@ Untuk mengamankan session (mencegah pencurian) dan mengamankan kata sandi yang d
    ```bash
    sudo a2enmod ssl
    sudo a2enmod rewrite
+   sudo a2enmod headers
    ```
 2. **Buat File Sertifikat SSL Mandiri (Umur 365 Hari):**
    ```bash
@@ -165,10 +166,14 @@ Untuk mengamankan session (mencegah pencurian) dan mengamankan kata sandi yang d
        SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
        
        <Directory /var/www/html/Kamsis>
-           Options Indexes FollowSymLinks
+           Options -Indexes +FollowSymLinks
            AllowOverride All
            Require all granted
        </Directory>
+
+       Header always set X-Content-Type-Options "nosniff"
+       Header always set X-Frame-Options "SAMEORIGIN"
+       Header always set Referrer-Policy "strict-origin-when-cross-origin"
    </VirtualHost>
    ```
 4. **Aktifkan Profil SSL:**
