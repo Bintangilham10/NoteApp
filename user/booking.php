@@ -14,53 +14,69 @@ $success = '';
 $room_id_selected = $_GET['room_id'] ?? 0;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $room_id = (int) $_POST['room_id'];
-    $tanggal = $_POST['tanggal_booking'];
-    $jam_mulai = $_POST['jam_mulai'];
-    $jam_selesai = $_POST['jam_selesai'];
-    $keperluan = trim($_POST['keperluan']);
+    $room_id = (int) ($_POST['room_id'] ?? 0);
+    $tanggal = $_POST['tanggal_booking'] ?? '';
+    $jam_mulai = $_POST['jam_mulai'] ?? '';
+    $jam_selesai = $_POST['jam_selesai'] ?? '';
+    $keperluan = trim($_POST['keperluan'] ?? '');
     $user_id = $_SESSION['user_id'];
+    $booking_date = DateTime::createFromFormat('Y-m-d', $tanggal);
 
-    if (strlen($keperluan) > 1000) {
+    if (!is_valid_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error = "Sesi form tidak valid. Silakan muat ulang halaman.";
+    } elseif (strlen($keperluan) > 1000) {
         $error = "Keperluan terlalu panjang.";
     } elseif (empty($room_id) || empty($tanggal) || empty($jam_mulai) || empty($jam_selesai) || empty($keperluan)) {
         $error = "Semua field wajib diisi.";
+    } elseif (!$booking_date || $booking_date->format('Y-m-d') !== $tanggal) {
+        $error = "Format tanggal tidak valid.";
+    } elseif ($booking_date < new DateTime('today')) {
+        $error = "Tanggal booking tidak boleh di masa lalu.";
+    } elseif (!preg_match('/^\d{2}:\d{2}$/', $jam_mulai) || !preg_match('/^\d{2}:\d{2}$/', $jam_selesai)) {
+        $error = "Format jam tidak valid.";
     } elseif (strtotime($jam_selesai) <= strtotime($jam_mulai)) {
         $error = "Jam selesai harus setelah jam mulai.";
     } else {
-        // Cek clash (Bentrok Jadwal) pada ruangan dan tanggal yang sama
-        // Rumus sederhana overlap: (StartA < EndB) AND (EndA > StartB)
-        $stmt_clash = $pdo->prepare("
-            SELECT id FROM bookings 
-            WHERE room_id = :room_id 
-              AND tanggal_booking = :tanggal 
-              AND status IN ('pending', 'approved') 
-              AND (jam_mulai < :jam_selesai AND jam_selesai > :jam_mulai)
-        ");
-        
-        $stmt_clash->execute([
-            'room_id' => $room_id,
-            'tanggal' => $tanggal,
-            'jam_mulai' => $jam_mulai,
-            'jam_selesai' => $jam_selesai
-        ]);
+        $stmt_room = $pdo->prepare("SELECT id FROM rooms WHERE id = ?");
+        $stmt_room->execute([$room_id]);
 
-        if ($stmt_clash->fetch()) {
-            $error = "Periode jadwal penuh/bentrok dengan booking lain (Pending/Approved). Harap pilih jam atau hari lain.";
+        if (!$stmt_room->fetch()) {
+            $error = "Ruangan tidak ditemukan.";
         } else {
-            // Insert Booking
-            try {
-                $stmt = $pdo->prepare("
-                    INSERT INTO bookings (user_id, room_id, tanggal_booking, jam_mulai, jam_selesai, keperluan, status) 
-                    VALUES (?, ?, ?, ?, ?, ?, 'pending')
-                ");
-                $stmt->execute([$user_id, $room_id, $tanggal, $jam_mulai, $jam_selesai, $keperluan]);
-                
-                $_SESSION['success_msg'] = "Pengajuan booking berhasil dibuat dan sedang menunggu approval.";
-                header("Location: my_bookings.php");
-                exit;
-            } catch (PDOException $e) {
-                $error = "Terjadi kesalahan pada sistem saat menyimpan data.";
+            // Cek clash (Bentrok Jadwal) pada ruangan dan tanggal yang sama
+            // Rumus sederhana overlap: (StartA < EndB) AND (EndA > StartB)
+            $stmt_clash = $pdo->prepare("
+                SELECT id FROM bookings
+                WHERE room_id = :room_id
+                  AND tanggal_booking = :tanggal
+                  AND status IN ('pending', 'approved')
+                  AND (jam_mulai < :jam_selesai AND jam_selesai > :jam_mulai)
+            ");
+
+            $stmt_clash->execute([
+                'room_id' => $room_id,
+                'tanggal' => $tanggal,
+                'jam_mulai' => $jam_mulai,
+                'jam_selesai' => $jam_selesai
+            ]);
+
+            if ($stmt_clash->fetch()) {
+                $error = "Periode jadwal penuh/bentrok dengan booking lain (Pending/Approved). Harap pilih jam atau hari lain.";
+            } else {
+                // Insert Booking
+                try {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO bookings (user_id, room_id, tanggal_booking, jam_mulai, jam_selesai, keperluan, status)
+                        VALUES (?, ?, ?, ?, ?, ?, 'pending')
+                    ");
+                    $stmt->execute([$user_id, $room_id, $tanggal, $jam_mulai, $jam_selesai, $keperluan]);
+
+                    $_SESSION['success_msg'] = "Pengajuan booking berhasil dibuat dan sedang menunggu approval.";
+                    header("Location: my_bookings.php");
+                    exit;
+                } catch (PDOException $e) {
+                    $error = "Terjadi kesalahan pada sistem saat menyimpan data.";
+                }
             }
         }
     }
@@ -83,6 +99,7 @@ require_once '../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" action="booking.php">
+        <?= csrf_input() ?>
         <div class="form-group">
             <label class="form-label">Pilih Ruangan</label>
             <select name="room_id" class="form-control" required>
