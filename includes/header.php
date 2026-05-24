@@ -47,7 +47,10 @@ if (isset($_SESSION['user_id'])):
         <span style="color: var(--text-muted); margin-left: 1rem; border-left: 1px solid var(--border-color); padding-left: 1rem;">
             Halo, <?= htmlspecialchars($_SESSION['nama_lengkap']) ?>
         </span>
-        <a href="<?= $base_url ?>auth/logout.php" class="btn-logout" onclick="return confirm('Yakin ingin keluar?');">Keluar</a>
+        <form method="POST" action="<?= $base_url ?>auth/logout.php" style="display: inline; margin: 0;" onsubmit="return confirm('Yakin ingin keluar?');">
+            <?= csrf_input() ?>
+            <button type="submit" class="btn-logout" style="border: 0; cursor: pointer; font: inherit;">Keluar</button>
+        </form>
     </div>
 </nav>
 <?php endif; ?>
