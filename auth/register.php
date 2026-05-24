@@ -20,7 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $konfirmasi_password = $_POST['konfirmasi_password'] ?? '';
 
     // Validasi panjang input mencegah serangan buffer overflow basic/kerusakan DB
-    if (strlen($nama_lengkap) > 100 || strlen($nim_nip) > 50 || strlen($password) > 255) {
+    if (!is_valid_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error = "Sesi form tidak valid. Silakan muat ulang halaman.";
+    } elseif (strlen($nama_lengkap) > 100 || strlen($nim_nip) > 50 || strlen($password) > 255) {
         $error = "Gagal. Panjang input melebihi batas maksimal.";
     } elseif (empty($nama_lengkap) || empty($nim_nip) || empty($password)) {
         $error = "Semua kolom wajib diisi.";
@@ -92,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="POST" action="">
+                <?= csrf_input() ?>
                 <div class="form-group">
                     <label class="form-label">Nama Lengkap</label>
                     <input type="text" name="nama_lengkap" class="form-control" required maxlength="100" placeholder="Contoh: Bintang" value="<?= escape($_POST['nama_lengkap'] ?? '') ?>">
