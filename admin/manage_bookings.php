@@ -17,7 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $booking_id = $_POST['booking_id'] ?? 0;
     $status = $_POST['status'] ?? ''; // 'approved' atau 'rejected'
 
-    if ($booking_id > 0 && in_array($status, ['approved', 'rejected'])) {
+    if (!is_valid_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error = "Sesi form tidak valid. Silakan muat ulang halaman.";
+    } elseif ($booking_id > 0 && in_array($status, ['approved', 'rejected'], true)) {
         try {
             $stmt = $pdo->prepare("UPDATE bookings SET status = :status WHERE id = :id");
             $stmt->execute(['status' => $status, 'id' => $booking_id]);
@@ -101,11 +103,13 @@ require_once '../includes/header.php';
                             <td>
                                 <?php if ($b['status'] === 'pending'): ?>
                                     <form method="POST" style="display: inline-block;">
+                                        <?= csrf_input() ?>
                                         <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
                                         <input type="hidden" name="status" value="approved">
                                         <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui booking ini?');">Approve</button>
                                     </form>
                                     <form method="POST" style="display: inline-block;">
+                                        <?= csrf_input() ?>
                                         <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
                                         <input type="hidden" name="status" value="rejected">
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tolak booking ini?');">Reject</button>
