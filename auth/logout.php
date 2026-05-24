@@ -3,6 +3,11 @@
 require_once '../config/security.php';
 start_secure_session();
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !is_valid_csrf_token($_POST['csrf_token'] ?? '')) {
+    header("Location: ../index.php");
+    exit;
+}
+
 // Hapus secara manual semua data dalam variabel global sesion
 $_SESSION = array();
 
