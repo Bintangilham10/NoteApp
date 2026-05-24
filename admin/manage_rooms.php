@@ -10,52 +10,63 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 $action = $_GET['action'] ?? 'list';
+if (!in_array($action, ['list', 'add', 'edit'], true)) {
+    $action = 'list';
+}
 $error = '';
 $success = '';
 
-// Proses Delete
-if ($action === 'delete') {
-    $id = $_GET['id'] ?? 0;
-    try {
-        $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $_SESSION['success_msg'] = "Ruangan berhasil dihapus.";
-        header("Location: manage_rooms.php");
-        exit;
-    } catch (PDOException $e) {
-        $error = "Gagal menghapus ruangan karena masih ada data booking terkait.";
-    }
-}
-
 // Proses Create / Edit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama_ruangan = trim($_POST['nama_ruangan']);
-    $kapasitas = (int) $_POST['kapasitas'];
-    $fasilitas = trim($_POST['fasilitas']);
-    $foto = trim($_POST['foto']); // Hanya menampung nama file/URL mockup sementara
-    $id = $_POST['id'] ?? 0;
+    $form_action = $_POST['form_action'] ?? 'save';
 
-    if (strlen($nama_ruangan) > 100 || strlen($fasilitas) > 2000 || strlen($foto) > 255) {
-        $error = "Panjang input melebihi batas yang diizinkan.";
-    } elseif (empty($nama_ruangan) || $kapasitas <= 0 || empty($fasilitas)) {
-        $error = "Nama ruangan, fasilitas, dan kapasitas (di atas 0) wajib diisi.";
-    } else {
-        try {
-            if ($id > 0) {
-                // Update
-                $stmt = $pdo->prepare("UPDATE rooms SET nama_ruangan=?, kapasitas=?, fasilitas=?, foto=? WHERE id=?");
-                $stmt->execute([$nama_ruangan, $kapasitas, $fasilitas, $foto, $id]);
-                $_SESSION['success_msg'] = "Data ruangan diperbarui.";
-            } else {
-                // Insert
-                $stmt = $pdo->prepare("INSERT INTO rooms (nama_ruangan, kapasitas, fasilitas, foto) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$nama_ruangan, $kapasitas, $fasilitas, $foto]);
-                $_SESSION['success_msg'] = "Ruangan baru berhasil ditambahkan.";
+    if (!is_valid_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error = "Sesi form tidak valid. Silakan muat ulang halaman.";
+    } elseif ($form_action === 'delete') {
+        $id = (int) ($_POST['id'] ?? 0);
+
+        if ($id <= 0) {
+            $error = "Data ruangan tidak valid.";
+        } else {
+            try {
+                $stmt = $pdo->prepare("DELETE FROM rooms WHERE id = :id");
+                $stmt->execute(['id' => $id]);
+                $_SESSION['success_msg'] = "Ruangan berhasil dihapus.";
+                header("Location: manage_rooms.php");
+                exit;
+            } catch (PDOException $e) {
+                $error = "Gagal menghapus ruangan karena masih ada data booking terkait.";
             }
-            header("Location: manage_rooms.php");
-            exit;
-        } catch (PDOException $e) {
-            $error = "Terjadi kesalahan sistem saat menyimpan ke database.";
+        }
+    } else {
+        $nama_ruangan = trim($_POST['nama_ruangan'] ?? '');
+        $kapasitas = (int) ($_POST['kapasitas'] ?? 0);
+        $fasilitas = trim($_POST['fasilitas'] ?? '');
+        $foto = trim($_POST['foto'] ?? ''); // Hanya menampung nama file/URL mockup sementara
+        $id = (int) ($_POST['id'] ?? 0);
+
+        if (strlen($nama_ruangan) > 100 || strlen($fasilitas) > 2000 || strlen($foto) > 255) {
+            $error = "Panjang input melebihi batas yang diizinkan.";
+        } elseif (empty($nama_ruangan) || $kapasitas <= 0 || empty($fasilitas)) {
+            $error = "Nama ruangan, fasilitas, dan kapasitas (di atas 0) wajib diisi.";
+        } else {
+            try {
+                if ($id > 0) {
+                    // Update
+                    $stmt = $pdo->prepare("UPDATE rooms SET nama_ruangan=?, kapasitas=?, fasilitas=?, foto=? WHERE id=?");
+                    $stmt->execute([$nama_ruangan, $kapasitas, $fasilitas, $foto, $id]);
+                    $_SESSION['success_msg'] = "Data ruangan diperbarui.";
+                } else {
+                    // Insert
+                    $stmt = $pdo->prepare("INSERT INTO rooms (nama_ruangan, kapasitas, fasilitas, foto) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$nama_ruangan, $kapasitas, $fasilitas, $foto]);
+                    $_SESSION['success_msg'] = "Ruangan baru berhasil ditambahkan.";
+                }
+                header("Location: manage_rooms.php");
+                exit;
+            } catch (PDOException $e) {
+                $error = "Terjadi kesalahan sistem saat menyimpan ke database.";
+            }
         }
     }
 }
@@ -113,7 +124,12 @@ require_once '../includes/header.php';
                             <td><?= escape($r['fasilitas']) ?></td>
                             <td>
                                 <a href="manage_rooms.php?action=edit&id=<?= $r['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                                <a href="manage_rooms.php?action=delete&id=<?= $r['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus ruangan ini secara permanen?');">Hapus</a>
+                                <form method="POST" style="display: inline-block;" onsubmit="return confirm('Hapus ruangan ini secara permanen?');">
+                                    <?= csrf_input() ?>
+                                    <input type="hidden" name="form_action" value="delete">
+                                    <input type="hidden" name="id" value="<?= $r['id'] ?>">
+                                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                </form>
                             </td>
                         </tr>
                     <?php 
@@ -143,6 +159,8 @@ require_once '../includes/header.php';
     <div class="card" style="max-width: 600px; margin: 0 auto;">
         <h2><?= $action === 'add' ? 'Tambah Ruangan Baru' : 'Edit Ruangan' ?></h2>
         <form method="POST" action="manage_rooms.php?action=<?= $action ?>" style="margin-top: 1.5rem;">
+            <?= csrf_input() ?>
+            <input type="hidden" name="form_action" value="save">
             <?php if ($room): ?>
                 <input type="hidden" name="id" value="<?= $room['id'] ?>">
             <?php endif; ?>
